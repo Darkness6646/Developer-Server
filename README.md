@@ -1,35 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
+
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matrix Receiver System</title>
+<title>Receiver</title>
 
 <style>
-
-html,body{
-    margin:0;
-    padding:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
+body{
     background:black;
-    font-family:Courier New,monospace;
     color:#00ff00;
+    font-family:monospace;
+    padding:20px;
 }
 
-canvas{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:1;
+.box{
+    border:1px solid #00ff00;
+    padding:10px;
+    margin:10px 0;
+}
+</style>
+
+</head>
+<body>
+
+<h2>RECEIVER INBOX</h2>
+
+<div id="log"></div>
+
+<script>
+
+function load(){
+
+    const box = document.getElementById("log");
+
+    const data = JSON.parse(localStorage.getItem("mailbox")) || [];
+
+    box.innerHTML = "";
+
+    if(data.length === 0){
+        box.innerHTML = "NO MESSAGES";
+        return;
+    }
+
+    data.forEach(d => {
+
+        const div = document.createElement("div");
+        div.className = "box";
+
+        div.innerHTML = `
+            <b>PLAYER ID:</b> ${d.player}<br>
+            <b>ZONE ID:</b> ${d.zone}<br>
+            <b>TIME:</b> ${d.time}
+        `;
+
+        box.appendChild(div);
+
+    });
+
 }
 
-.center-box{
-    position:relative;
-    z-index:5;
+// live update
+setInterval(load, 1000);
+
+load();
+
+</script>
+
+</body>
+</html>    z-index:5;
     width:90%;
     max-width:700px;
     margin:auto;
