@@ -1,28 +1,25 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>System Override</title>
+<title>Matrix Receiver System</title>
 
 <style>
 
-body, html{
+html,body{
     margin:0;
     padding:0;
     width:100%;
     height:100%;
-    background:#000;
     overflow:hidden;
-    font-family:Courier New, monospace;
+    background:black;
+    font-family:Courier New,monospace;
     color:#00ff00;
-    display:flex;
-    justify-content:center;
-    align-items:center;
 }
 
 canvas{
-    position:absolute;
+    position:fixed;
     top:0;
     left:0;
     width:100%;
@@ -30,100 +27,79 @@ canvas{
     z-index:1;
 }
 
-.ui-container{
+.center-box{
     position:relative;
-    z-index:3;
+    z-index:5;
+    width:90%;
+    max-width:700px;
+    margin:auto;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(0,0,0,.85);
+    border:2px solid #00ff00;
+    padding:25px;
+    box-shadow:0 0 25px rgba(0,255,0,.5);
+}
+
+.title{
+    font-size:1.5rem;
+    margin-bottom:20px;
     text-align:center;
 }
 
-#init-btn,
-#granted-btn,
-#login-btn{
-    background:transparent;
+input{
+    width:100%;
+    padding:14px;
+    margin-top:10px;
+    background:black;
     color:#00ff00;
-    border:2px solid #00ff00;
-    padding:15px 40px;
-    font-size:1rem;
+    border:1px solid #00ff00;
+    box-sizing:border-box;
     font-family:inherit;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    margin-top:15px;
+    background:black;
+    color:#00ff00;
+    border:1px solid #00ff00;
     cursor:pointer;
-    border-radius:5px;
+    font-family:inherit;
+    font-weight:bold;
     transition:.3s;
 }
 
-#init-btn:hover,
-#granted-btn:hover,
-#login-btn:hover{
+button:hover{
     background:#00ff00;
-    color:#000;
-    box-shadow:0 0 20px #00ff00;
+    color:black;
 }
 
-#countdown{
-    font-size:7rem;
+#receiver-panel{
     display:none;
-    margin-bottom:20px;
-    animation:pulse 1s infinite;
 }
 
-#frame-container{
-    position:relative;
-    z-index:2;
-    display:none;
-    opacity:0;
-    transition:1s;
-    padding:40px;
-    background:#000;
-    border:2px solid #00ff00;
-    box-shadow:0 0 30px rgba(0,255,0,.5);
-    width:80%;
-    max-width:900px;
-}
-
-#developer-login{
-    margin-bottom:20px;
-}
-
-#dev-user,
-#dev-pass{
-    padding:10px;
-    margin:5px;
-    background:#000;
-    color:#00ff00;
+.message-box{
     border:1px solid #00ff00;
-    width:220px;
+    padding:15px;
+    margin-top:15px;
 }
 
-#live-output{
-    display:none;
-    margin-top:20px;
-    border:1px solid #00ff00;
-    padding:10px;
-    max-height:250px;
-    overflow:auto;
-    text-align:left;
+.status{
+    margin-top:10px;
+    opacity:.7;
+    font-size:.9rem;
 }
 
-#access-panel{
-    display:none;
-    margin-top:20px;
+.clear-btn{
+    border-color:#ff4444;
+    color:#ff4444;
 }
 
-.fake-app{
-    border:1px solid #00ff00;
-    padding:10px;
-    margin:10px 0;
-    cursor:pointer;
-}
-
-.fake-app:hover{
-    background:#00ff00;
-    color:#000;
-}
-
-@keyframes pulse{
-    0%{transform:scale(1);}
-    50%{transform:scale(1.05);}
-    100%{transform:scale(1);}
+.clear-btn:hover{
+    background:#ff4444;
+    color:black;
 }
 
 </style>
@@ -133,105 +109,80 @@ canvas{
 
 <canvas id="matrix"></canvas>
 
-<div id="frame-container">
+<!-- LOGIN -->
 
-    <div id="developer-login">
+<div
+    class="center-box"
+    id="login-panel"
+>
 
-        <input
-            id="dev-user"
-            type="text"
-            placeholder="Developer Username"
-        >
-
-        <input
-            id="dev-pass"
-            type="password"
-            placeholder="Developer Password"
-        >
-
-        <button id="login-btn">
-            LOGIN
-        </button>
-
+    <div class="title">
+        DEVELOPER SECURITY LOGIN
     </div>
 
-    <div id="live-output"></div>
+    <input
+        type="text"
+        id="username"
+        placeholder="Developer Username"
+    >
 
-    <button id="granted-btn">
-        CORE CONTROL NODE
+    <input
+        type="password"
+        id="password"
+        placeholder="Developer Password"
+    >
+
+    <button onclick="loginSystem()">
+        ACCESS SYSTEM
     </button>
 
-    <div id="access-panel">
-
-        <h2>SIMULATED SYSTEM ACCESS</h2>
-
-        <div
-            class="fake-app"
-            onclick="openDemo('Messaging Console')"
-        >
-            Messaging Console
-        </div>
-
-        <div
-            class="fake-app"
-            onclick="openDemo('Archive Database')"
-        >
-            Archive Database
-        </div>
-
-        <div
-            class="fake-app"
-            onclick="openDemo('Security Logs')"
-        >
-            Security Logs
-        </div>
-
+    <div class="status">
+        AUTHORIZED PERSONNEL ONLY
     </div>
 
 </div>
 
-<div class="ui-container" id="ui-box">
+<!-- RECEIVER -->
 
-    <button id="init-btn">
-        INITIALIZE SYSTEM BYPASS
+<div
+    class="center-box"
+    id="receiver-panel"
+>
+
+    <div class="title">
+        MESSAGE CONTROL CENTER
+    </div>
+
+    <div id="messages"></div>
+
+    <button
+        class="clear-btn"
+        onclick="clearMessages()"
+    >
+        CLEAR ALL MESSAGES
     </button>
 
-    <div id="countdown">5</div>
-
 </div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-const canvas = document.getElementById('matrix');
-const ctx = canvas.getContext('2d');
 
-const btn = document.getElementById('init-btn');
-const countdownEl = document.getElementById('countdown');
+/* MATRIX EFFECT */
 
-const uiBox = document.getElementById('ui-box');
+const canvas =
+document.getElementById(
+    'matrix'
+);
 
-const frameContainer =
-document.getElementById('frame-container');
-
-const grantedBtn =
-document.getElementById('granted-btn');
-
-const accessPanel =
-document.getElementById('access-panel');
-
-const loginBtn =
-document.getElementById('login-btn');
-
-const liveOutput =
-document.getElementById('live-output');
+const ctx =
+canvas.getContext('2d');
 
 function resizeCanvas(){
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width =
+    window.innerWidth;
+
+    canvas.height =
+    window.innerHeight;
 
 }
 
@@ -243,21 +194,25 @@ window.addEventListener(
 );
 
 const chars =
-"010101_SYSTEM_ACCESS_GRANTED";
+"01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-const charArray = chars.split("");
+const letters =
+chars.split("");
 
 const fontSize = 16;
 
-let columns = canvas.width / fontSize;
+const columns =
+canvas.width / fontSize;
 
-let drops =
-Array(Math.floor(columns)).fill(1);
+const drops =
+Array(
+    Math.floor(columns)
+).fill(1);
 
 function drawMatrix(){
 
     ctx.fillStyle =
-    'rgba(0,0,0,0.05)';
+    "rgba(0,0,0,0.05)";
 
     ctx.fillRect(
         0,
@@ -266,18 +221,24 @@ function drawMatrix(){
         canvas.height
     );
 
-    ctx.fillStyle = '#00ff00';
+    ctx.fillStyle =
+    "#00ff00";
 
     ctx.font =
-    fontSize + 'px monospace';
+    fontSize +
+    "px monospace";
 
-    for(let i = 0; i < drops.length; i++){
+    for(
+        let i = 0;
+        i < drops.length;
+        i++
+    ){
 
         const text =
-        charArray[
+        letters[
             Math.floor(
                 Math.random() *
-                charArray.length
+                letters.length
             )
         ];
 
@@ -292,7 +253,9 @@ function drawMatrix(){
             canvas.height &&
             Math.random() > 0.975
         ){
+
             drops[i] = 0;
+
         }
 
         drops[i]++;
@@ -301,217 +264,177 @@ function drawMatrix(){
 
 }
 
-btn.addEventListener('click', () => {
+setInterval(
+    drawMatrix,
+    35
+);
 
-    btn.style.display = 'none';
+/* LOGIN */
 
-    setInterval(drawMatrix, 33);
+function loginSystem(){
 
-    countdownEl.style.display = 'block';
-
-    let timeLeft = 5;
-
-    const timer = setInterval(() => {
-
-        timeLeft--;
-
-        if(timeLeft > 0){
-
-            countdownEl.textContent =
-            timeLeft;
-
-        } else {
-
-            clearInterval(timer);
-
-            countdownEl.textContent =
-            'ACCESSING...';
-
-            revealTargetFrame();
-
-        }
-
-    },1000);
-
-});
-
-function revealTargetFrame(){
-
-    uiBox.style.display = 'none';
-
-    frameContainer.style.display =
-    'block';
-
-    setTimeout(() => {
-
-        frameContainer.style.opacity =
-        '1';
-
-    },50);
-
-}
-
-const DEV_USERNAME = 'developer';
-const DEV_PASSWORD = 'quantum123';
-
-const firebaseConfig = {
-
-    apiKey:'YOUR_API_KEY',
-
-    authDomain:
-    'YOUR_PROJECT.firebaseapp.com',
-
-    databaseURL:
-    'https://YOUR_PROJECT.firebaseio.com',
-
-    projectId:'YOUR_PROJECT',
-
-    storageBucket:
-    'YOUR_PROJECT.appspot.com',
-
-    messagingSenderId:
-    'YOUR_SENDER_ID',
-
-    appId:'YOUR_APP_ID'
-
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const database = firebase.database();
-
-grantedBtn.addEventListener('click', () => {
-
-    // Restricted unless login succeeds
-    if(
-        liveOutput.style.display !==
-        'block'
-    ){
-
-        alert(
-            'ACCESS RESTRICTED\n\n' +
-            'Developer authentication required.'
-        );
-
-        return;
-    }
-
-    accessPanel.style.display = 'block';
-
-    const visitTime = new Date();
-
-    const visitor =
-    prompt('Enter your name:')
-    || 'Unknown Visitor';
-
-    database.ref('liveVisitors').push({
-
-        visitor:visitor,
-
-        date:
-        visitTime.toLocaleDateString(),
-
-        time:
-        visitTime.toLocaleTimeString(),
-
-        device:navigator.userAgent
-
-    });
-
-});
-
-loginBtn.addEventListener('click', () => {
-
-    liveOutput.style.display = 'none';
-
-    const username =
+    const user =
     document.getElementById(
-        'dev-user'
+        'username'
     ).value;
 
-    const password =
+    const pass =
     document.getElementById(
-        'dev-pass'
+        'password'
     ).value;
 
-    if(
-        username.trim() ===
-        DEV_USERNAME &&
+    const correctUser =
+    'developer';
 
-        password.trim() ===
-        DEV_PASSWORD
+    const correctPass =
+    'override';
+
+    if(
+        user === correctUser &&
+        pass === correctPass
     ){
 
-        liveOutput.style.display =
+        document.getElementById(
+            'login-panel'
+        ).style.display =
+        'none';
+
+        document.getElementById(
+            'receiver-panel'
+        ).style.display =
         'block';
 
-        database
-        .ref('liveVisitors')
-        .on('child_added',
-        (snapshot) => {
-
-            const data =
-            snapshot.val();
-
-            const log =
-            document.createElement(
-                'div'
-            );
-
-            log.innerHTML = `
-
-            <strong>Visitor:</strong>
-            ${data.visitor}<br>
-
-            <strong>Date:</strong>
-            ${data.date}<br>
-
-            <strong>Time:</strong>
-            ${data.time}<br>
-
-            <strong>Device:</strong>
-            ${data.device}
-
-            <hr>
-
-            `;
-
-            liveOutput.prepend(log);
-
-        });
-
-        alert(
-        'Developer access granted.'
-        );
+        loadMessages();
 
     } else {
 
-        liveOutput.style.display =
-        'none';
-
         alert(
-        'ACCESS DENIED\n\n' +
-
-        'Please check if the ' +
-
-        'username and password ' +
-
-        'are typed correctly.'
+            'ACCESS DENIED'
         );
 
     }
 
-});
+}
 
-function openDemo(name){
+/* LOAD RECEIVED DATA */
 
-    alert(
-        name +
-        ' opened successfully.'
+function loadMessages(){
+
+    const mailbox =
+    JSON.parse(
+        localStorage.getItem(
+            'mlbb_orders'
+        )
+    ) || [];
+
+    const messages =
+    document.getElementById(
+        'messages'
     );
+
+    messages.innerHTML = '';
+
+    if(mailbox.length === 0){
+
+        messages.innerHTML = `
+
+        <div class="message-box">
+            NO RECEIVED DATA
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+    mailbox.forEach(data => {
+
+        const div =
+        document.createElement(
+            'div'
+        );
+
+        div.className =
+        'message-box';
+
+        div.innerHTML = `
+
+        <strong>
+        [PLAYER ID]
+        </strong>
+
+        <br><br>
+
+        ${data.player_id}
+
+        <br><br>
+
+        <strong>
+        [ZONE ID]
+        </strong>
+
+        <br><br>
+
+        ${data.zone_id}
+
+        <br><br>
+
+        <strong>
+        [PACKAGE]
+        </strong>
+
+        <br><br>
+
+        ${data.package}
+
+        <br><br>
+
+        <strong>
+        [TIME]
+        </strong>
+
+        <br><br>
+
+        ${data.time}
+
+        `;
+
+        messages.appendChild(div);
+
+    });
+
+}
+
+/* AUTO REFRESH */
+
+setInterval(() => {
+
+    if(
+        document.getElementById(
+            'receiver-panel'
+        ).style.display === 'block'
+    ){
+
+        loadMessages();
+
+    }
+
+},1000);
+
+/* CLEAR */
+
+function clearMessages(){
+
+    localStorage.removeItem(
+        'mlbb_orders'
+    );
+
+    loadMessages();
 
 }
 
 </script>
+
 </body>
 </html>
