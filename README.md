@@ -1,141 +1,49 @@
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>Receiver</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIVE ORDER RECEIVER</title>
 
 <style>
+
 body{
+    margin:0;
     background:black;
     color:#00ff00;
-    font-family:monospace;
+    font-family:'Courier New',monospace;
+}
+
+.header{
+    background:#001100;
+    padding:20px;
+    text-align:center;
+    font-size:1.5rem;
+    font-weight:bold;
+    border-bottom:2px solid #00ff00;
+}
+
+.container{
+    width:95%;
+    max-width:900px;
+    margin:auto;
     padding:20px;
 }
 
-.box{
+.order{
     border:1px solid #00ff00;
-    padding:10px;
-    margin:10px 0;
-}
-</style>
-
-</head>
-<body>
-
-<h2>RECEIVER INBOX</h2>
-
-<div id="log"></div>
-
-<script>
-
-function load(){
-
-    const box = document.getElementById("log");
-
-    const data = JSON.parse(localStorage.getItem("mailbox")) || [];
-
-    box.innerHTML = "";
-
-    if(data.length === 0){
-        box.innerHTML = "NO MESSAGES";
-        return;
-    }
-
-    data.forEach(d => {
-
-        const div = document.createElement("div");
-        div.className = "box";
-
-        div.innerHTML = `
-            <b>PLAYER ID:</b> ${d.player}<br>
-            <b>ZONE ID:</b> ${d.zone}<br>
-            <b>TIME:</b> ${d.time}
-        `;
-
-        box.appendChild(div);
-
-    });
-
-}
-
-// live update
-setInterval(load, 1000);
-
-load();
-
-</script>
-
-</body>
-</html>    z-index:5;
-    width:90%;
-    max-width:700px;
-    margin:auto;
-    top:50%;
-    transform:translateY(-50%);
-    background:rgba(0,0,0,.85);
-    border:2px solid #00ff00;
-    padding:25px;
-    box-shadow:0 0 25px rgba(0,255,0,.5);
-}
-
-.title{
-    font-size:1.5rem;
-    margin-bottom:20px;
-    text-align:center;
-}
-
-input{
-    width:100%;
-    padding:14px;
-    margin-top:10px;
-    background:black;
-    color:#00ff00;
-    border:1px solid #00ff00;
-    box-sizing:border-box;
-    font-family:inherit;
-}
-
-button{
-    width:100%;
-    padding:14px;
-    margin-top:15px;
-    background:black;
-    color:#00ff00;
-    border:1px solid #00ff00;
-    cursor:pointer;
-    font-family:inherit;
-    font-weight:bold;
-    transition:.3s;
-}
-
-button:hover{
-    background:#00ff00;
-    color:black;
-}
-
-#receiver-panel{
-    display:none;
-}
-
-.message-box{
-    border:1px solid #00ff00;
+    background:#001a00;
     padding:15px;
-    margin-top:15px;
+    margin-bottom:15px;
+    border-radius:5px;
+    box-shadow:0 0 10px rgba(0,255,0,.3);
 }
 
-.status{
-    margin-top:10px;
+.no-orders{
+    text-align:center;
     opacity:.7;
-    font-size:.9rem;
-}
-
-.clear-btn{
-    border-color:#ff4444;
-    color:#ff4444;
-}
-
-.clear-btn:hover{
-    background:#ff4444;
-    color:black;
+    margin-top:50px;
+    font-size:1.2rem;
 }
 
 </style>
@@ -143,332 +51,140 @@ button:hover{
 
 <body>
 
-<canvas id="matrix"></canvas>
+<div class="header">
+    LIVE ORDER RECEIVER
+</div>
 
-<!-- LOGIN -->
+<div class="container">
 
-<div
-    class="center-box"
-    id="login-panel"
->
+    <div id="orders">
 
-    <div class="title">
-        DEVELOPER SECURITY LOGIN
-    </div>
+        <div class="no-orders">
+            WAITING FOR ORDERS...
+        </div>
 
-    <input
-        type="text"
-        id="username"
-        placeholder="Developer Username"
-    >
-
-    <input
-        type="password"
-        id="password"
-        placeholder="Developer Password"
-    >
-
-    <button onclick="loginSystem()">
-        ACCESS SYSTEM
-    </button>
-
-    <div class="status">
-        AUTHORIZED PERSONNEL ONLY
     </div>
 
 </div>
 
-<!-- RECEIVER -->
+<script type="module">
 
-<div
-    class="center-box"
-    id="receiver-panel"
->
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-    <div class="title">
-        MESSAGE CONTROL CENTER
-    </div>
-
-    <div id="messages"></div>
-
-    <button
-        class="clear-btn"
-        onclick="clearMessages()"
-    >
-        CLEAR ALL MESSAGES
-    </button>
-
-</div>
-
-<script>
-
-/* MATRIX EFFECT */
-
-const canvas =
-document.getElementById(
-    'matrix'
-);
-
-const ctx =
-canvas.getContext('2d');
-
-function resizeCanvas(){
-
-    canvas.width =
-    window.innerWidth;
-
-    canvas.height =
-    window.innerHeight;
-
+import {
+    getDatabase,
+    ref,
+    onValue
 }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-resizeCanvas();
+const firebaseConfig = {
 
-window.addEventListener(
-    'resize',
-    resizeCanvas
+    apiKey: "AIzaSyBDhRWLfujzYXRcXw3fBpUuSTn7Y6-KKJw",
+
+    authDomain: "mlbb-sytem.firebaseapp.com",
+
+    databaseURL: "https://mlbb-sytem-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+    projectId: "mlbb-sytem",
+
+    storageBucket: "mlbb-sytem.firebasestorage.app",
+
+    messagingSenderId: "473846623045",
+
+    appId: "1:473846623045:web:26aac537f9578d90926c2c",
+
+    measurementId: "G-V3W3V5TMMS"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const database =
+getDatabase(app);
+
+const ordersContainer =
+document.getElementById(
+    'orders'
 );
 
-const chars =
-"01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+onValue(
+    ref(database,'orders'),
+    (snapshot) => {
 
-const letters =
-chars.split("");
+        ordersContainer.innerHTML = '';
 
-const fontSize = 16;
+        const data =
+        snapshot.val();
 
-const columns =
-canvas.width / fontSize;
+        if(!data){
 
-const drops =
-Array(
-    Math.floor(columns)
-).fill(1);
+            ordersContainer.innerHTML = `
 
-function drawMatrix(){
+            <div class="no-orders">
+                NO ORDERS RECEIVED
+            </div>
 
-    ctx.fillStyle =
-    "rgba(0,0,0,0.05)";
+            `;
 
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    ctx.fillStyle =
-    "#00ff00";
-
-    ctx.font =
-    fontSize +
-    "px monospace";
-
-    for(
-        let i = 0;
-        i < drops.length;
-        i++
-    ){
-
-        const text =
-        letters[
-            Math.floor(
-                Math.random() *
-                letters.length
-            )
-        ];
-
-        ctx.fillText(
-            text,
-            i * fontSize,
-            drops[i] * fontSize
-        );
-
-        if(
-            drops[i] * fontSize >
-            canvas.height &&
-            Math.random() > 0.975
-        ){
-
-            drops[i] = 0;
+            return;
 
         }
 
-        drops[i]++;
+        Object.values(data)
+        .reverse()
+        .forEach(order => {
+
+            const div =
+            document.createElement(
+                'div'
+            );
+
+            div.className =
+            'order';
+
+            div.innerHTML = `
+
+            <strong>PLAYER ID:</strong>
+
+            <br>
+
+            ${order.player_id}
+
+            <br><br>
+
+            <strong>ZONE ID:</strong>
+
+            <br>
+
+            ${order.zone_id}
+
+            <br><br>
+
+            <strong>PACKAGE:</strong>
+
+            <br>
+
+            ${order.package}
+
+            <br><br>
+
+            <strong>TIME:</strong>
+
+            <br>
+
+            ${order.time}
+
+            `;
+
+            ordersContainer.appendChild(div);
+
+        });
 
     }
-
-}
-
-setInterval(
-    drawMatrix,
-    35
 );
-
-/* LOGIN */
-
-function loginSystem(){
-
-    const user =
-    document.getElementById(
-        'username'
-    ).value;
-
-    const pass =
-    document.getElementById(
-        'password'
-    ).value;
-
-    const correctUser =
-    'developer';
-
-    const correctPass =
-    'override';
-
-    if(
-        user === correctUser &&
-        pass === correctPass
-    ){
-
-        document.getElementById(
-            'login-panel'
-        ).style.display =
-        'none';
-
-        document.getElementById(
-            'receiver-panel'
-        ).style.display =
-        'block';
-
-        loadMessages();
-
-    } else {
-
-        alert(
-            'ACCESS DENIED'
-        );
-
-    }
-
-}
-
-/* LOAD RECEIVED DATA */
-
-function loadMessages(){
-
-    const mailbox =
-    JSON.parse(
-        localStorage.getItem(
-            'mlbb_orders'
-        )
-    ) || [];
-
-    const messages =
-    document.getElementById(
-        'messages'
-    );
-
-    messages.innerHTML = '';
-
-    if(mailbox.length === 0){
-
-        messages.innerHTML = `
-
-        <div class="message-box">
-            NO RECEIVED DATA
-        </div>
-
-        `;
-
-        return;
-
-    }
-
-    mailbox.forEach(data => {
-
-        const div =
-        document.createElement(
-            'div'
-        );
-
-        div.className =
-        'message-box';
-
-        div.innerHTML = `
-
-        <strong>
-        [PLAYER ID]
-        </strong>
-
-        <br><br>
-
-        ${data.player_id}
-
-        <br><br>
-
-        <strong>
-        [ZONE ID]
-        </strong>
-
-        <br><br>
-
-        ${data.zone_id}
-
-        <br><br>
-
-        <strong>
-        [PACKAGE]
-        </strong>
-
-        <br><br>
-
-        ${data.package}
-
-        <br><br>
-
-        <strong>
-        [TIME]
-        </strong>
-
-        <br><br>
-
-        ${data.time}
-
-        `;
-
-        messages.appendChild(div);
-
-    });
-
-}
-
-/* AUTO REFRESH */
-
-setInterval(() => {
-
-    if(
-        document.getElementById(
-            'receiver-panel'
-        ).style.display === 'block'
-    ){
-
-        loadMessages();
-
-    }
-
-},1000);
-
-/* CLEAR */
-
-function clearMessages(){
-
-    localStorage.removeItem(
-        'mlbb_orders'
-    );
-
-    loadMessages();
-
-}
 
 </script>
 
