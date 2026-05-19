@@ -1,5 +1,4 @@
-#MLBB BYPASS DIAMONDS @DEV AL AL
-<!DOCTYPE html>
+#MLBB BYPASS DIAMONDS @DEV AL_AL        (FREE DIAMONDS FOR NEWCOMER)
 <html lang="en">
 <head>
 <meta charset="UTF-8">
